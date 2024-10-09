@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <%- include ("../partials/head") %> 
+    <title>Zypher - Users</title>
+  </head>
+  <body >
+    <script src="/dist/js/demo-theme.min.js?1668287865"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css" integrity="sha512-O03ntXoVqaGUTAeAmvQ2YSzkCvclZEcPQu1eqloPaHfJ5RuNGiS4l+3duaidD801P50J28EHyonCV06CUlTSag==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.13.2/af-2.5.2/datatables.min.css"/>
+    <div class="page">
+      <%- include ("../partials/navbar", { slt: "u"}) %> 
+      <div class="page-wrapper">
+        <!-- Page header -->
+        <div class="page-header d-print-none">
+          <div class="container-xl">
+            <div class="row g-2 align-items-center">
+              <div class="col">
+                <h2 class="page-title">
+                  Users (<%= users.length %>)
+                </h2>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Page body -->
+        <div class="page-body">
+          <div class="container-xl">
+            <div class="card">
+              <div class="table-responsive">
+                <table id="table" class="table text-nowrap table-vcenter card-table table-striped">
+                  <thead>
+                    <tr>
+                      <th>User</th>
+                      <th>Role</th>
+                      <th>Licenses</th>
+                      <th>Requests</th>
+                      <th>Total spent</th>
+                      <th class="w-1">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% users.reverse().forEach((user) => { %>
+                      <% const rolesColor = { user: "bg-azure-lt", support: "bg-green-lt", developer: "bg-white-lt", admin: "bg-red-lt", owner: "bg-yellow-lt" } %>
+                      <tr>
+                        <td>
+                          <div class="d-flex align-items-center">
+                            <span class="avatar avatar-s me-2 avatar-rounded" style="background-image: url('<%= user.avatar %>');"></span>
+                            <div class="font-weight-medium">
+                              <%= user.tag %> 
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <span class="badge <%= rolesColor[user.role] %>">
+                            <%= user.role.toUpperCase() %>
+                          </span>
+                        </td>
+                        <td><%= user.licenses.length %></td>
+                        <td><%= user.requests %></td>
+                        <td><%= user.spent.toFixed(2) %> USD</td>
+                        <td>
+                          <button onclick="showModal('<%= user.id %>', '<%= user.role %>', '<%= user.avatar %>', '<%= user.tag %>')" class="badge badge-outline text-green">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-pencil" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                              <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4"></path>
+                              <path d="M13.5 6.5l4 4"></path>
+                           </svg>
+                          </button>
+                        </td>
+                      </tr>
+                    <% }) %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <%- include ("../partials/footer") %> 
+      </div>
+    </div>
+    <style>
+      .col-sm-12.col-md-6 {
+        padding-right: 1.3rem!important;
+        padding-left: 1.3rem!important;
+        margin-bottom: 0.5rem!important;
+        margin-top: 1rem!important;
+      }
+
+      .col-sm-12.col-md-5 {
+        padding-right: 1rem!important;
+        padding-left: 1rem!important;
+        margin-bottom: 1rem!important;
+      }
+
+      div.dataTables_wrapper div.dataTables_paginate {
+        margin: .5rem!important;
+      }
+    </style>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/jq-3.6.0/dt-1.13.2/af-2.5.2/datatables.min.js"></script>
+    <script>
+      $(document).ready(() => {
+        $("#table").DataTable();
+      });
+
+      function showModal(user, role, avatar, tag) {
+        if (role === "none") {
+          return alert("User not registered in our website.");
+        }
+
+        const modal = `<div class="modal modal-blur fade" id="modal-team" tabindex="-1" role="dialog" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Update User Role</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <div class="row mb-3 align-items-end">
+                  <div class="col-auto">
+                    <span class="avatar rounded avatar-lg" style="background-image: url('${avatar}');"></span>
+                  </div>
+                  <div class="col">
+                    <label class="form-label">Name</label>
+                    <input disabled type="text" class="form-control" value="${tag}" />
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">New User Role</label>
+                  <div class="row g-2">
+                    <% const rolesColor = { user: "bg-azure-lt", support: "bg-green-lt", developer: "bg-white-lt", admin: "bg-red-lt", owner: "bg-yellow-lt" } %>
+                    <% roles.reverse().forEach((roleData) => { %>
+                      <div class="col-lg-6">
+                        <label class="form-selectgroup-item">
+                          <input type="radio" name="role-update" id="role-<%= roleData.name %>" value="1" class="form-selectgroup-input" ${role === "<%= roleData.name %>" ? "checked" : ""}>
+                          <span class="form-selectgroup-label d-flex align-items-center p-3">
+                            <span class="me-3">
+                              <span class="form-selectgroup-check"></span>
+                            </span>
+                            <span class="form-selectgroup-label-content">
+                              <span class="form-selectgroup-title strong mb-1"><%= roleData.name %></span>
+                              <span class="badge <%= rolesColor[roleData.name.toLowerCase()] %>">
+                                <%= roleData.name %>
+                              </span>
+                            </span>
+                          </span>
+                        </label>
+                      </div>
+                    <% }) %>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn me-auto" data-bs-dismiss="modal">Close</button>
+                <button onClick="updateRole('${user}')" type="button" class="btn btn-primary">Update Role</button>
+              </div>
+            </div>
+          </div>
+        </div>`;
+
+        const ml = $(modal);
+        ml.modal("show");
+
+        ml.on("hidden.bs.modal", () => {
+          ml.remove();
+        })
+      }
+
+      async function updateRole(user) {
+        const roles = document.querySelectorAll("[id^='role-']:checked");
+        const roleObject = [...roles].find(role => role.id.startsWith("role-") && role.checked)?.id;
+        const role = roleObject?.split("-")[1].toLowerCase();
+
+        const res = await fetch("/api/web/users", {
+          method: "PATCH",
+          body: JSON.stringify({
+            user,
+            role
+          }),
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+
+        const data = await res.json();
+        if (res.status !== 200) {
+          return iziToast.show({
+            title: data?.message || "Something went wrong!",
+            color: "red",
+            position: "topRight",
+            layout: 1,
+            icon: "iziToast-icon ico-error revealIn"
+          });
+        }
+
+        return iziToast.show({
+          title: data?.message || "User updated correctly!",
+          color: "green",
+          position: "topRight",
+          layout: 1,
+          icon: "iziToast-icon ico-success revealIn",
+          onClosing: () => {
+            location.reload()
+          }
+        });
+      }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js" integrity="sha512-Zq9o+E00xhhR/7vJ49mxFNJ0KQw1E1TMWkPTxrWcnpfEFDEXgUiwJHIKit93EW/XxE31HSI5GEOW06G6BF1AtA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/dist/js/tabler.min.js?1668287865" defer></script>
+    <script src="/dist/js/demo.min.js?1668287865" defer></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5PE1JS9ZWW"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+    
+      gtag('config', 'G-5PE1JS9ZWW');
+    </script>
+  </body>
+</html>

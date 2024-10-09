@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<%- include ("../partials/head") %>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css"
+			integrity="sha512-O03ntXoVqaGUTAeAmvQ2YSzkCvclZEcPQu1eqloPaHfJ5RuNGiS4l+3duaidD801P50J28EHyonCV06CUlTSag=="
+			crossorigin="anonymous" referrerpolicy="no-referrer" />
+		<title>Zypher - Products</title>
+</head>
+
+<body>
+	<script src="/dist/js/demo-theme.min.js?1668287865"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css"
+		integrity="sha512-O03ntXoVqaGUTAeAmvQ2YSzkCvclZEcPQu1eqloPaHfJ5RuNGiS4l+3duaidD801P50J28EHyonCV06CUlTSag=="
+		crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<link rel="stylesheet" type="text/css"
+		href="https://cdn.datatables.net/v/bs5/dt-1.13.2/af-2.5.2/datatables.min.css" />
+	<div class="page">
+		<%- include ("../partials/navbar", { slt: "p" }) %>
+			<div class="page-wrapper">
+				<!-- Page header -->
+				<div class="page-header d-print-none">
+					<div class="container-xl">
+						<div class="row g-2 align-items-center">
+							<div class="col">
+								<h2 class="page-title">
+									Products
+								</h2>
+							</div>
+							<div class="col-auto ms-auto d-print-none">
+								<div class="btn-list">
+									<a href="/add-product" class="btn btn-primary d-none d-sm-inline-block">
+										<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus" width="24"
+											height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+											stroke-linecap="round" stroke-linejoin="round">
+											<path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+											<path d="M12 5l0 14"></path>
+											<path d="M5 12l14 0"></path>
+										</svg>
+										Create Product
+									</a>
+									<button onclick="showModal()" class="btn btn-success d-none d-sm-inline-block">
+										<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-upload" width="24"
+											height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+											stroke-linecap="round" stroke-linejoin="round">
+											<path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+											<path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"></path>
+											<path d="M7 9l5 -5l5 5"></path>
+											<path d="M12 4l0 12"></path>
+										</svg>
+										Update Product
+									</button>
+									<button onclick="showModalDelete()" class="btn btn-danger d-none d-sm-inline-block">
+										<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash-x" width="24"
+											height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+											stroke-linecap="round" stroke-linejoin="round">
+											<path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+											<path d="M4 7h16"></path>
+											<path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
+											<path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
+											<path d="M10 12l4 4m0 -4l-4 4"></path>
+										</svg>
+										Delete Update
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- Page body -->
+				<div class="page-body">
+					<div class="container-xl">
+						<div class="card">
+							<div class="table-responsive">
+								<table id="table" class="table text-nowrap table-vcenter card-table table-striped">
+									<thead>
+										<tr>
+											<th>Name</th>
+											<th>Description</th>
+											<th>Price</th>
+											<th>Version</th>
+											<th class="w-1">Actions</th>
+										</tr>
+									</thead>
+									<tbody>
+										<% products.forEach((product)=> { %>
+											<tr>
+												<td>
+													<%= product.name %>
+												</td>
+												<td>
+													<%= product.description || "None" %>
+												</td>
+												<td>
+													<%= product.price.toFixed(2) %>
+												</td>
+												<td>
+													<%= product.version %>
+												</td>
+												<td class="d-flex gap-2">
+													<a href="/products/<%= product.name %>" class="badge badge-outline text-green">
+														<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-pencil"
+															width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+															fill="none" stroke-linecap="round" stroke-linejoin="round">
+															<path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+															<path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4"></path>
+															<path d="M13.5 6.5l4 4"></path>
+														</svg>
+													</a>
+													<button onclick="deleteProduct('<%= product.name %>')" class="badge badge-outline text-red">
+														<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-x" width="24"
+															height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+															stroke-linecap="round" stroke-linejoin="round">
+															<path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+															<path d="M18 6l-12 12"></path>
+															<path d="M6 6l12 12"></path>
+														</svg>
+													</button>
+												</td>
+											</tr>
+											<% }) %>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+				<%- include ("../partials/footer") %>
+			</div>
+	</div>
+	<style>
+		.col-sm-12.col-md-6 {
+			padding-right: 1.3rem !important;
+			padding-left: 1.3rem !important;
+			margin-bottom: 0.5rem !important;
+			margin-top: 1rem !important;
+		}
+
+		.col-sm-12.col-md-5 {
+			padding-right: 1rem !important;
+			padding-left: 1rem !important;
+			margin-bottom: 1rem !important;
+		}
+
+		div.dataTables_wrapper div.dataTables_paginate {
+			margin: .5rem !important;
+		}
+	</style>
+	<script type="text/javascript"
+		src="https://cdn.datatables.net/v/bs5/jq-3.6.0/dt-1.13.2/af-2.5.2/datatables.min.js"></script>
+	<script>
+		$(document).ready(() => {
+			$("#table").DataTable();
+		});
+
+		let selectedProduct = null;
+		let selectedVersion = null;
+
+		function showModal() {
+			const modal = `<div class="modal modal-blur fade" id="modal-team" tabindex="-1" role="dialog" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Update product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <div class="mb-3">
+                  <label class="form-label">Select the product to update:</label>
+                  <div class="row g-2">
+                    <% products.forEach(product => { %>
+                      <div class="col-lg-6">
+                        <label class="form-selectgroup-item">
+                          <input type="radio" name="role-update" id="<%= product.name %>" value="1" class="form-selectgroup-input">
+                          <span class="form-selectgroup-label d-flex align-items-center p-3">
+                            <span class="me-3">
+                              <span class="form-selectgroup-check"></span>
+                            </span>
+                            <span class="form-selectgroup-label-content">
+                              <span class="form-selectgroup-title strong mb-1"><%= product.name %></span>
+                            </span>
+                          </span>
+                        </label>
+                      </div>
+                    <% }) %>
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <div class="col">
+                    <label class="form-label">New content:</label>
+                    <div class="dropzone" id="dropzone-default">
+                      <input name="file" type="file"  />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="modal-footer">
+                <button type="button" class="btn me-auto" data-bs-dismiss="modal">Close</button>
+                <button onClick="uploadUpdate()" class="btn btn-primary">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-device-floppy" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2"></path>
+                    <path d="M12 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
+                    <path d="M14 4l0 4l-6 0l0 -4"></path>
+                 </svg>
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>`;
+
+			const ml = $(modal);
+			ml.modal("show");
+
+			ml.on("hidden.bs.modal", () => {
+				ml.remove();
+			})
+		}
+
+		function showModalDelete() {
+			const modal = `<div class="modal modal-blur fade" id="modal-team" tabindex="-1" role="dialog" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Delete product update</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <div class="mb-3">
+                  <label class="form-label">Select the product to delete:</label>
+                  <div class="row g-2">
+                    <% products.forEach(product => { %>
+                      <div class="col-lg-6">
+                        <label class="form-selectgroup-item">
+                          <input type="radio" name="remove-product" id="<%= product.name %>" value="1" class="form-selectgroup-input">
+                          <span class="form-selectgroup-label d-flex align-items-center p-3">
+                            <span class="me-3">
+                              <span class="form-selectgroup-check"></span>
+                            </span>
+                            <span class="form-selectgroup-label-content">
+                              <span class="form-selectgroup-title strong mb-1"><%= product.name %></span>
+                            </span>
+                          </span>
+                        </label>
+                      </div>
+                    <% }) %>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">Versions:</label>
+                  <select class="form-select">
+                    
+                  </select>
+                </div>
+              </div>
+
+              <div class="modal-footer">
+                <button type="button" class="btn me-auto" data-bs-dismiss="modal">Close</button>
+                <button onClick="deleteVersion()" class="btn btn-danger">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash-x" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                     <path d="M4 7h16"></path>
+                     <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
+                     <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
+                     <path d="M10 12l4 4m0 -4l-4 4"></path>
+                  </svg>
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>`;
+
+			const ml = $(modal);
+			ml.modal("show");
+
+			selectedProduct = null;
+			const radioGroup = ml.find('input[name="remove-product"]');
+			const select = ml.find('select.form-select');
+
+			select.on('change', function () {
+				selectedVersion = $(this).val();
+			});
+
+			radioGroup.on('change', async function (event) {
+				if (selectedProduct === event.target.id) return;
+				selectedProduct = event.target.id;
+				try {
+					const response = await fetch(`/api/updates/${selectedProduct}`);
+					if (response.ok) {
+						const {
+							versions
+						} = await response.json();
+						selectedVersion = versions.length ? versions[0] : null;
+						select.empty();
+
+						if (!versions.length) {
+							return select.append('<option disabled selected>No versions available</option>');
+						}
+
+						versions.forEach((version) => {
+							select.append(`<option value="${version}">${version}</option>`);
+						});
+					}
+				} catch (error) {
+					console.error(error);
+				}
+			});
+
+			ml.on("hidden.bs.modal", () => {
+				ml.remove();
+			})
+		}
+
+		async function uploadUpdate() {
+			const product = document.querySelector('input[name="role-update"]:checked')?.id;
+			const file = document.querySelector('input[name="file"]').files[0];
+
+			if (!file || !product) {
+				return iziToast.show({
+					title: "You need specify a file or a product!",
+					color: "red",
+					position: "topRight",
+					layout: 1,
+					icon: "iziToast-icon ico-success revealIn"
+				});
+			}
+
+			const formData = new FormData();
+			formData.append('file', file);
+
+			const res = await fetch(`/api/update/${product}`, {
+				method: "POST",
+				body: formData
+			});
+
+			const data = await res.json();
+			if (res.status === 200) {
+				return iziToast.show({
+					title: data?.message,
+					color: "green",
+					position: "topRight",
+					layout: 1,
+					icon: "iziToast-icon ico-success revealIn",
+					onClosing: () => {
+						location.reload()
+					}
+				});
+			}
+		}
+
+		async function deleteVersion() {
+			if (!selectedProduct || !selectedVersion) return;
+			try {
+				const res = await fetch(`/api/updates/${selectedProduct}/${selectedVersion}`, {
+					method: "DELETE"
+				})
+
+				return iziToast.show({
+					title: res.ok ? "Version deleted successfully" : "There was an error deleting that version",
+					color: res.ok ? "green" : "red",
+					position: "topRight",
+					layout: 1,
+					icon: "iziToast-icon ico-success revealIn",
+					onClosing: () => {
+						location.reload()
+					}
+				});
+			} catch (error) {
+
+			}
+		}
+
+		async function deleteProduct(query) {
+			iziToast.show({
+				theme: 'dark',
+				icon: 'iziToast-icon ico-error revealIn',
+				title: 'Are you sure?',
+				message: "You won't be able to revert this!",
+				layout: 2,
+				position: 'center',
+				overlay: true,
+				progressBarColor: 'rgb(0, 255, 184)',
+				buttons: [
+					[
+						'<button class="btn btn-danger">Delete</button>',
+						async function (instance, toast) {
+							await instance.hide({ transitionOut: 'fadeOutUp', }, toast);
+							const res = await fetch(`/api/web/products/${query}`, {
+								method: "DELETE"
+							});
+
+							const data = await res.json();
+
+							if (res.status !== 200) {
+								return iziToast.show({
+									title: data?.message || "Something went wrong!",
+									color: "red",
+									position: "topRight",
+									layout: 1,
+									icon: "iziToast-icon ico-error revealIn"
+								});
+							}
+
+							return iziToast.show({
+								title: data?.message || "Product deleted correctly!",
+								color: "green",
+								position: "topRight",
+								layout: 1,
+								icon: "iziToast-icon ico-success revealIn",
+								onClosing: () => {
+									location.reload()
+								}
+							});
+						},
+						true
+					],
+					[
+						'<button>Close</button>',
+						function (instance, toast) {
+							instance.hide({
+								transitionOut: 'fadeOutUp',
+							}, toast, 'buttonName');
+						}
+					]
+				]
+			});
+		}
+	</script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js"
+		integrity="sha512-Zq9o+E00xhhR/7vJ49mxFNJ0KQw1E1TMWkPTxrWcnpfEFDEXgUiwJHIKit93EW/XxE31HSI5GEOW06G6BF1AtA=="
+		crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script src="/dist/js/tabler.min.js?1668287865" defer></script>
+	<script src="/dist/js/demo.min.js?1668287865" defer></script>
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-5PE1JS9ZWW"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+	
+	  gtag('config', 'G-5PE1JS9ZWW');
+	</script>
+</body>
+
+</html>

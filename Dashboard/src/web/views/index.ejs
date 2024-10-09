@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <%- include ("../partials/head") %>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css" integrity="sha512-O03ntXoVqaGUTAeAmvQ2YSzkCvclZEcPQu1eqloPaHfJ5RuNGiS4l+3duaidD801P50J28EHyonCV06CUlTSag==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.13.2/af-2.5.2/datatables.min.css"/>
+    <title>Zypher - Dashboard</title>
+  </head>
+  <body>
+    <script src="/dist/js/demo-theme.min.js?1668287865"></script>
+    <div class="page">
+      <%- include ("../partials/navbar", { slt: "h"}) %> 
+      <div class="page-wrapper">
+        <div class="page-header d-print-none">
+          <div class="container-xl">
+            <div class="row g-2 align-items-center">
+              <div class="col">
+                <div class="page-pretitle">
+                  Overview
+                </div>
+                <h2 class="page-title">
+                  Dashboard
+                </h2>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="page-body">
+          <div class="container-xl">
+            <div class="row row-deck row-cards">
+              <!-- Header -->
+              <div class="col-12">
+                <div class="card card-md">
+                  <div class="card-stamp card-stamp-lg">
+                    <div class="card-stamp-icon bg-primary">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-lock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M5 11m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z"></path>
+                        <path d="M12 16m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
+                        <path d="M8 11v-4a4 4 0 0 1 8 0v4"></path>
+                     </svg>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="row align-items-center">
+                      <div class="col-10">
+                        <h3 class="h1">Zypher - License Manager</h3>
+                        <div class="markdown text-muted">
+                          With Zypher you can easily manage your license keys and downloads from our store
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+               <div class="col-12">
+                <div class="card">
+                  <div class="card-body">
+                    <table id="table" class="table table-vcenter text-nowrap card-table table-striped">
+                      <thead>
+                        <tr>
+                          <th>License</th>
+                          <th>Product</th>
+                          <th>Created By</th>
+                          <th>Expires at</th>
+                          <th>Status</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      <% licenses.forEach(license => { %>
+                        <% const currentDate = new Date(); %>
+                        <% const expiresDate = new Date(license.expires_date); %>
+                        <tr>
+                          <td><%= license.license %></td>
+                          <td><%= license.product_name %></td>
+                          <td><%= license.createdBy %></td>
+                          <td>
+                            <% if (license.expires_date) { %>
+                              <%= license.expires_date.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" }) %>
+                            <% } else { %>
+                              Never
+                            <% } %>
+                          </td>
+                          <td>
+                            <% if (license.ip_list.length > license.ip_cap || license.hwid_list.length > license.hwid_cap) { %>
+                              <span class="badge bg-<%- (license.ip_list.length > license.ip_cap || license.hwid_list.length > license.hwid_cap) ? "red" : "green" %>">
+                                <% if (license.ip_list.length > license.ip_cap && license.hwid_list.length > license.hwid_cap) { %>
+                                  Inactive (IP-Cap & HWID-Cap Reached)
+                                <% } else if (license.ip_list.length > license.ip_cap) { %>
+                                  Inactive (IP-Cap Reached)
+                                <% } else if (license.hwid_list.length > license.hwid_cap) { %>
+                                  Inactive (HWID-Cap Reached)
+                                <% } else { %>
+                                  Active
+                                <% } %>
+                              </span>
+                            <% } else if (license.expires_date && currentDate > expiresDate) { %>
+                              <span class="badge bg-<%- license.expires_date && currentDate > expiresDate ? "red" : "green" %>">
+                                <% if (license.expires_date && currentDate > expiresDate) { %>
+                                  Inactive (Expired)
+                                <% } else { %>
+                                  Active
+                                <% } %>
+                              </span>
+                            <% } else { %>
+                                <span class="badge bg-green">
+                                    Active
+                                </span>
+                            <% } %>
+                          </td>
+                          <td class="d-flex gap-2">
+                            <button onclick="refreshLicense('<%= license.license %>')" class="badge badge-outline text-orange" title="Refresh License">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-refresh" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"></path>
+                                <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
+                              </svg>
+                            </button>
+                            <button onclick="resetData('<%= license.license %>')" class="badge badge-outline text-purple" title="Reset IP's & HWID's">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-zoom-reset" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M21 21l-6 -6"></path>
+                                <path d="M3.268 12.043a7.017 7.017 0 0 0 6.634 4.957a7.012 7.012 0 0 0 7.043 -6.131a7 7 0 0 0 -5.314 -7.672a7.021 7.021 0 0 0 -8.241 4.403"></path>
+                                <path d="M3 4v4h4"></path>
+                              </svg>
+                            </button>
+                          </td>
+                        </tr>
+                      <% }); %>
+
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+               </div>
+                <% if (user.role !== "user") { %>
+                <!-- 4 Cards -->
+                <div class="col-12">
+                  <div class="row row-cards">
+                    <div class="col-sm-6 col-lg-3">
+                      <div class="card card-sm">
+                        <div class="card-body">
+                          <div class="row align-items-center">
+                            <div class="col-auto">
+                            <span class="bg-primary text-white avatar">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M16.7 8a3 3 0 0 0 -2.7 -2h-4a3 3 0 0 0 0 6h4a3 3 0 0 1 0 6h-4a3 3 0 0 1 -2.7 -2"></path><path d="M12 3v3m0 12v3"></path></svg>
+                            </span>
+                            </div>
+                            <div class="col">
+                              <div class="font-weight-medium">
+                                <%= licenses.length %> Sales
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                      <div class="card card-sm">
+                        <div class="card-body">
+                          <div class="row align-items-center">
+                            <div class="col-auto">
+                            <span class="bg-twitter text-white avatar">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-users" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"></path>
+                                <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                <path d="M21 21v-2a4 4 0 0 0 -3 -3.85"></path>
+                             </svg>
+                            </span>
+                            </div>
+                            <div class="col">
+                              <div class="font-weight-medium">
+                                <%= stats.users %> Users
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                      <div class="card card-sm">
+                        <div class="card-body">
+                          <div class="row align-items-center">
+                            <div class="col-auto">
+                            <span class="bg-green text-white avatar">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-package" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M12 3l8 4.5l0 9l-8 4.5l-8 -4.5l0 -9l8 -4.5"></path>
+                                <path d="M12 12l8 -4.5"></path>
+                                <path d="M12 12l0 9"></path>
+                                <path d="M12 12l-8 -4.5"></path>
+                                <path d="M16 5.25l-8 4.5"></path>
+                             </svg>
+                            </span>
+                            </div>
+                            <div class="col">
+                              <div class="font-weight-medium">
+                                <%= stats.products %> Products
+                              </div>
+                              <div class="text-muted">
+                                <%= licenses.length %> licenses
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                      <div class="card card-sm">
+                        <div class="card-body">
+                          <div class="row align-items-center">
+                            <div class="col-auto">
+                            <span class="bg-facebook text-white avatar">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-activity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M3 12h4l3 8l4 -16l3 8h4"></path>
+                             </svg>
+                            </span>
+                            </div>
+                            <div class="col">
+                              <div class="font-weight-medium">
+                                <%= stats.requests.reduce((acc, day) => acc + (day?.rejected_requests + day?.successful_requests), 0); %> Requests
+                              </div>
+                              <div class="text-muted">
+                                <%= stats.requests.at(-1)?.rejected_requests + stats.requests.at(-1)?.successful_requests %> today
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Traffic Summary -->
+                <div class="col-lg-6">
+                  <div class="card">
+                    <div class="card-body">
+                      <h3 class="card-title">Traffic summary</h3>
+                      <% if (stats.requests.length) { %>
+                        <div id="chart-mentions" class="chart-lg"></div>
+                      <% } else { %>
+                        <div class="card-body placeholder-glow">
+                          <div class="placeholder col-9 mb-3"></div>
+                          <div class="placeholder placeholder-xs col-10"></div>
+                          <div class="placeholder placeholder-xs col-12"></div>
+                          <div class="placeholder placeholder-xs col-11"></div>
+                          <div class="placeholder placeholder-xs col-8"></div>
+                          <div class="placeholder placeholder-xs col-10"></div>
+                          <div class="placeholder placeholder-xs col-11"></div>
+                          <div class="placeholder placeholder-xs col-8"></div>
+                          <div class="placeholder placeholder-xs col-10"></div>
+                        </div>
+                      <% } %>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Sales Summary -->
+                <div class="col-lg-6">
+                  <div class="card">
+                    <div class="card-body">
+                      <h3 class="card-title">Sales summary</h3>
+                      <% if (stats.sales.length) { %>
+                        <div id="chart-sales" class="chart-lg"></div>
+                      <% } else { %>
+                        <div class="card-body text-start placeholder-glow">
+                          <div class="placeholder col-9 mb-3"></div>
+                          <div class="placeholder placeholder-xs col-10"></div>
+                          <div class="placeholder placeholder-xs col-12"></div>
+                          <div class="placeholder placeholder-xs col-11"></div>
+                          <div class="placeholder placeholder-xs col-8"></div>
+                          <div class="placeholder placeholder-xs col-10"></div>
+                          <div class="placeholder placeholder-xs col-11"></div>
+                          <div class="placeholder placeholder-xs col-8"></div>
+                          <div class="placeholder placeholder-xs col-10"></div>
+                        </div>
+                      <% } %>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-lg-6">
+                  <div class="card">
+                    <div class="card-body">
+                      <h3 class="card-title">Last 5 Transactions</h3>
+                      <div class="card-table table-responsive">
+                        <table class="table text-nowrap table-vcenter">
+                          <thead>
+                          <tr>
+                            <th>User</th>
+                            <th>Product</th>
+                            <th>Created At</th>
+                          </tr>
+                          </thead>
+                          <tbody>
+                          <% licenses.slice(-5).reverse().forEach(license => { %>
+                            <tr>
+                              <td>
+                                <div class="d-flex align-items-center">
+                                  <span class="avatar avatar-sm me-2 avatar-rounded" style="background-image: url('<%= license.avatar %>')"></span>
+                                  <div class="font-weight-medium">
+                                    <%= license.tag %>
+                                  </div>
+                                </div>
+                              </td>
+
+                              <td class="td-truncate">
+                                <div class="text-truncate">
+                                  <%= license.license.product_name %>
+                                </div>
+                              </td>
+
+                              <td class="text-nowrap">
+                                <%= license.createdAt.toLocaleDateString("en-US") %>
+                              </td>
+                            </tr>
+                          <% }) %>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-lg-6">
+                  <div class="card">
+                    <div class="card-body">
+                      <h3 class="card-title">Last 5 Requests</h3>
+                      <div class="card-table table-responsive">
+                        <table class="table table-vcenter">
+                          <thead>
+                          <tr>
+                            <th>Status</th>
+                            <th>Ip</th>
+                            <th>Date</th>
+                          </tr>
+                          </thead>
+                          <tbody>
+                          <% if (stats.requests.length) { %>
+                            <% stats.requests.at(-1).requests.slice(-5).reverse().forEach((rq) => { %>
+                              <% const date = rq.date.toLocaleDateString("en-US") %>
+                              <tr>
+                                <td class="w-1">
+                                <span class="badge bg-<%= rq.rejected ? "red" : "green" %> w-8 h-8">
+                                  <% if (rq.rejected) { %>
+                                    <%- `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-circle-x" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path><path d="M10 10l4 4m0 -4l-4 4"></path></svg>` %>
+                                  <% } else { %>
+                                    <%- `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M5 12l5 5l10 -10"></path></svg>` %>
+                                  <% } %>
+                                </span>
+                                </td>
+                                <td class="td-truncate">
+                                  <div class="text-truncate">
+                                    <%= rq.ip %>
+                                  </div>
+                                </td>
+                                <td class="text-nowrap text-muted">
+                                  <%= date %>
+                                </td>
+                              </tr>
+                            <% }) %>
+                          <% } %>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-lg-6">
+              <div class="card">
+                <div class="card-body">
+                  <h3 class="card-title">Last 5 Requests</h3>
+                  <div class="card-table table-responsive">
+                    <table class="table table-vcenter">
+                      <thead>
+                        <tr>
+                          <th>Status</th>
+                          <th>Ip</th>
+                          <th>Date</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <% if (stats.requests.length) { %>
+                          <% stats.requests.at(-1).requests.slice(-5).reverse().forEach((rq) => { %>
+                            <% const date = rq.date.toLocaleDateString("en-US") %> 
+                            <tr>
+                              <td class="w-1">
+                                <span class="badge bg-<%= rq.rejected ? "red" : "green" %> w-8 h-8">
+                                  <% if (rq.rejected) { %> 
+                                    <%- `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-circle-x" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path><path d="M10 10l4 4m0 -4l-4 4"></path></svg>` %> 
+                                  <% } else { %>
+                                    <%- `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M5 12l5 5l10 -10"></path></svg>` %>
+                                  <% } %>
+                                </span>
+                              </td>
+                              <td class="td-truncate">
+                                <div class="text-truncate">
+                                  <%= rq.ip %>
+                                </div>
+                              </td>
+                              <td class="text-nowrap text-muted">
+                                <%= date %>
+                              </td>
+                            </tr>
+                          <% }) %>
+                        <% } %>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+                </div>
+              <% } %> 
+            </div>
+          </div>
+        </div>
+        <%- include ("../partials/footer") %> 
+      </div>
+    </div>
+    <% if (user.role !== "user") { %>
+      <script>
+        const groupBy = function(xs, key) {
+          return xs.reduce(function (rv, x) {
+            (rv[x[key]] = rv[x[key]] || []).push(x);
+            return rv;
+          }, {});
+        };
+      </script>
+      <script>
+        let sales = JSON.parse('<%- JSON.stringify(stats.sales) %>');
+        sales = sales.map(l => {
+          l.createdAt = new Date(l.createdAt).toLocaleDateString("en-US");
+          return l;
+        });
+  
+        sales = groupBy(sales, "createdAt");
+        document.addEventListener("DOMContentLoaded", function () {
+          window.ApexCharts && (new ApexCharts(document.getElementById('chart-sales'), {
+            chart: {
+              type: "area",
+              fontFamily: 'inherit',
+              height: 240,
+              sparkline: {
+                enabled: true
+              },
+              animations: {
+                enabled: false
+              },
+            },
+            dataLabels: {
+              enabled: false,
+            },
+            fill: {
+              opacity: .16,
+              type: 'solid'
+            },
+            stroke: {
+              width: 2,
+              lineCap: "round",
+              curve: "smooth",
+            },
+            series: [{
+              name: "Purchases",
+              data: Object.entries(sales).map(([k,v]) => v.length)
+            }],
+            tooltip: {
+              theme: 'dark'
+            },
+            grid: {
+              strokeDashArray: 4,
+            },
+            xaxis: {
+              labels: {
+                padding: 0,
+              },
+              tooltip: {
+                enabled: false
+              },
+              axisBorder: {
+                show: false,
+              },
+              type: 'datetime',
+            },
+            yaxis: {
+              labels: {
+                padding: 4
+              },
+            },
+            labels: Object.entries(sales).map(([k,v]) => k),
+            colors: [tabler.getColor("primary")],
+            legend: {
+              show: false,
+            },
+            point: {
+              show: false
+            },
+          })).render();
+        });
+      </script>
+      <script>
+        import findLicense from "../../helpers/findLicense";
+
+        const requests = JSON.parse('<%- JSON.stringify(stats.requests) %>');
+        document.addEventListener("DOMContentLoaded", function () {
+          window.ApexCharts && (new ApexCharts(document.getElementById('chart-mentions'), {
+            chart: {
+              type: "bar",
+              fontFamily: 'inherit',
+              height: 240,
+              parentHeightOffset: 0,
+              toolbar: {
+                show: false,
+              },
+              animations: {
+                enabled: false
+              },
+              stacked: true,
+            },
+            plotOptions: {
+              bar: {
+                columnWidth: '50%',
+              }
+            },
+            dataLabels: {
+              enabled: false,
+            },
+            fill: {
+              opacity: 1,
+            },
+            series: [
+              {
+                name: "Rejected",
+                data: requests.map((day) => day.rejected_requests)
+              },
+              {
+                name: "Success",
+                data: requests.map((day) => day.successful_requests)
+              },
+            ],
+            tooltip: {
+              theme: 'dark'
+            },
+            grid: {
+              padding: {
+                top: -20,
+                right: 0,
+                left: -4,
+                bottom: -4
+              },
+              strokeDashArray: 4,
+              xaxis: {
+                lines: {
+                  show: true
+                }
+              },
+            },
+            xaxis: {
+              labels: {
+                padding: 0,
+              },
+              tooltip: {
+                enabled: false
+              },
+              axisBorder: {
+                show: false,
+              },
+              type: 'datetime',
+            },
+            yaxis: {
+              labels: {
+                padding: 4
+              },
+            },
+            labels: requests.map(d => d.date),
+            colors: [tabler.getColor("danger"), tabler.getColor("primary", 0.8)],
+            legend: {
+              show: false,
+            },
+          })).render();
+        });          
+      </script>
+    <% } %>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/jq-3.6.0/dt-1.13.2/af-2.5.2/datatables.min.js"></script>
+    <script>
+      let table = null;
+      $(document).ready(() => {
+        table = $("#table").DataTable();
+      });
+
+      async function resetData(license) {
+        iziToast.show({
+          theme: 'dark',
+          icon: 'iziToast-icon ico-error revealIn',
+          title: 'Are you sure you want to reset your IPs & HWIDs?',
+          message: "You won't be able to revert this!",
+          layout: 2,
+          position: 'center',
+          overlay: true,
+          progressBarColor: 'rgb(0, 255, 184)',
+          buttons: [
+            [
+              '<button class="btn btn-danger">Reset IPS & HWIDS</button>',
+              async function(instance, toast) {
+                await instance.hide({ transitionOut: 'fadeOutUp', }, toast);
+                const res = await fetch(`/api/web/reset-license/${license}`, {
+                  method: "PATCH"
+                });
+
+                const data = await res.json();
+
+                if (res.status !== 210) {
+                  return iziToast.show({
+                    title: data?.message || "Something went wrong!",
+                    color: "red",
+                    position: "topRight",
+                    layout: 1,
+                    icon: "iziToast-icon ico-error revealIn"
+                  });
+                }
+                
+                return iziToast.show({
+                  title: data?.message || "IP's & HWID's reset correctly!",
+                  color: "green",
+                  position: "topRight",
+                  layout: 1,
+                  icon: "iziToast-icon ico-success revealIn",
+                  onClosing: () => {
+                    location.reload()
+                  }
+                });
+              },
+              true
+            ],
+            [
+              '<button>Close</button>',
+              function (instance, toast) {
+                instance.hide({
+                  transitionOut: 'fadeOutUp',
+                }, toast, 'buttonName');
+              }
+            ]
+          ]
+        });
+      }
+
+      async function refreshLicense(license) {
+        iziToast.show({
+          theme: 'dark',
+          icon: 'iziToast-icon ico-error revealIn',
+          title: 'Are you sure you want to refresh your license?',
+          message: "You won't be able to revert this!",
+          layout: 2,
+          position: 'center',
+          overlay: true,
+          progressBarColor: 'rgb(0, 255, 184)',
+          buttons: [
+            [
+              '<button class="btn btn-danger">Refresh License</button>',
+              async function(instance, toast) {
+                await instance.hide({ transitionOut: 'fadeOutUp', }, toast);
+                const res = await fetch(`/api/web/refresh-license/${license}`, {
+                  method: "PATCH"
+                });
+
+                const data = await res.json();
+
+                if (res.status !== 210) {
+                  return iziToast.show({
+                    title: data?.message || "Something went wrong!",
+                    color: "red",
+                    position: "topRight",
+                    layout: 1,
+                    icon: "iziToast-icon ico-error revealIn"
+                  });
+                }
+
+                return iziToast.show({
+                  title: data?.message || "License refreshed correctly!",
+                  color: "green",
+                  position: "topRight",
+                  layout: 1,
+                  icon: "iziToast-icon ico-success revealIn",
+                  onClosing: () => {
+                    location.reload()
+                  }
+                });
+              },
+              true
+            ],
+            [
+              '<button>Close</button>',
+              function (instance, toast) {
+                instance.hide({
+                  transitionOut: 'fadeOutUp',
+                }, toast, 'buttonName');
+              }
+            ]
+          ]
+        });
+      }
+    </script>
+
+    <style>
+      .col-sm-12.col-md-6 {
+        padding-right: 1.3rem!important;
+        padding-left: 1.3rem!important;
+        margin-bottom: 0.5rem!important;
+        margin-top: 1rem!important;
+      }
+
+      .col-sm-12.col-md-5 {
+        padding-right: 1rem!important;
+        padding-left: 1rem!important;
+        margin-bottom: 1rem!important;
+      }
+
+      div.dataTables_wrapper div.dataTables_paginate {
+        margin: .5rem!important;
+      }
+    </style>
+
+    <script src="/dist/libs/apexcharts/dist/apexcharts.min.js?1668287865" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js" integrity="sha512-Zq9o+E00xhhR/7vJ49mxFNJ0KQw1E1TMWkPTxrWcnpfEFDEXgUiwJHIKit93EW/XxE31HSI5GEOW06G6BF1AtA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/dist/js/tabler.min.js?1668287865" defer></script>
+    <script src="/dist/js/demo.min.js?1668287865" defer></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5PE1JS9ZWW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-5PE1JS9ZWW');
+</script>
+    <!--Start of Tawk.to Script-->
+<script type="text/javascript">
+  var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+  (function(){
+  var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+  s1.async=true;
+  s1.src='https://embed.tawk.to/65464e25f2439e1631ebbecc/1heda2h12';
+  s1.charset='UTF-8';
+  s1.setAttribute('crossorigin','*');
+  s0.parentNode.insertBefore(s1,s0);
+  })();
+  </script>
+  <!--End of Tawk.to Script-->
+  </body>
+</html>

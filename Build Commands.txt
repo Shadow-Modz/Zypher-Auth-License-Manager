@@ -1,0 +1,2 @@
+npm run build and everything will be compiled to the dist folder.
+And the dashboard can be found in the web folder.

@@ -1,0 +1,56 @@
+GeneralSettings:
+  Token: ""
+  CustomerRole: "" # (Role ID) Leave blank to disable
+  EmbedColor: "Red"
+
+DatabaseSettings:
+  Uri: "mongodb://127.0.0.1:27017"
+  
+DashboardSettings:
+  ClientId: ""
+  ClientSecret: ""
+
+LicenseSettings:
+  ApiPort: 8393
+  SecretKey: "" # Encrypt key (48 characters or more)
+  PublicApiKey: ""  # Public API Key (use this for the /api/client endpoint)
+  SecretApiKey: "" # Use this for
+
+WebhookLogs:
+  Auth: "" # invalid license validation, license validated etc... | leave blank to disable
+  Commands: " # product or license created/deleted | leave blank to disable
+  Web: ""
+
+CommandsSettings:
+  Product:
+    Enabled: true
+    Permissions:
+      - ""
+  License:
+    Enabled: true
+    Permissions:
+      - ""
+  Mylicenses:
+    Enabled: true
+    Permissions:
+      - ""
+  Stats:
+    Enabled: true
+    Permissions:
+      - ""
+  Clearmyips:
+    Enabled: true
+    Permissions:
+      - ""
+  Clearmyhwids:
+    Enabled: true
+    Permissions:
+      - ""
+  Blacklist:
+    Enabled: true
+    Permissions:
+      - ""
+  Download:
+    Enabled: true
+    Permissions:
+      - ""

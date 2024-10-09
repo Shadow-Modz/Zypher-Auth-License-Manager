@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <%- include ("../partials/head") %>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css" integrity="sha512-O03ntXoVqaGUTAeAmvQ2YSzkCvclZEcPQu1eqloPaHfJ5RuNGiS4l+3duaidD801P50J28EHyonCV06CUlTSag==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.13.2/af-2.5.2/datatables.min.css"/>
+    <title>Zypher - Licenses</title>
+  </head>
+  <body >
+    <script src="/dist/js/demo-theme.min.js?1668287865"></script>
+    <div class="page">
+      <%- include ("../partials/navbar", { slt: "l"}) %> 
+      <div class="page-wrapper">
+        <div class="page-header d-print-none">
+          <div class="container-xl">
+            <div class="row g-2 align-items-center">
+              <div class="col">
+                <h2 class="page-title">
+                  Licenses (<%= licenses.length %>)
+                </h2>
+              </div>
+              <% if (user.role !== "support") { %>
+              <div class="col-auto ms-auto d-print-none">
+                <div class="btn-list">
+                  <a href="/add-new" class="btn btn-primary d-none d-sm-inline-block">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                      <path d="M12 5l0 14"></path>
+                      <path d="M5 12l14 0"></path>
+                   </svg>
+                    Create License
+                  </a>
+                </div>
+              </div>
+              <% } %>
+            </div>
+          </div>
+        </div>
+        
+        <div class="page-body">
+          <div class="container-xl">
+            <div class="card">
+              <div class="table-responsive">
+                <table id="table" class="table table-vcenter text-nowrap card-table table-striped">
+                  <thead>
+                    <tr>
+                      <th>User</th>
+                      <th>Date</th>
+                      <th>Reason</th>
+                      <th>License Key</th>
+                      <th>Product</th>
+                      <th>Expires at</th>
+                      <th>Status</th>
+                      <% if (user.role !== "support") { %>
+                      <th class="w-1">Actions</th>
+                      <% } %>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% licenses.forEach((license) => { %>
+                      <% const currentDate = new Date(); %>
+                      <% const expiresDate = new Date(license.expires_date); %>
+                      <tr>
+                        <td><%= license.discord_id %></td>
+                        <td><%= license.createdAt.toLocaleDateString("en-US") %></td>
+                        <td><%= license.reason || "None" %></td>
+                        <td><%= license.license %></td>
+                        <td>
+                          <a href="/products/<%= license.product_name %>" class="text-reset"><%= license.product_name %></a>
+                        </td>
+                        <td>
+                          <% if (license.expires_date) { %>
+                            <%= license.expires_date.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" }) %>
+                          <% } else { %>
+                            Never
+                          <% } %>
+                        </td>
+                        <td>
+                          <% if (license.ip_list && license.ip_list.length > license.ip_cap || license.hwid_list && license.hwid_list.length > license.hwid_cap) { %>
+                            <span class="badge bg-<%- (license.ip_list && license.ip_list.length > license.ip_cap || license.hwid_list && license.hwid_list.length > license.hwid_cap) ? "red" : "green" %>">
+                              <% if (license.ip_list && license.ip_list.length > license.ip_cap && license.hwid_list && license.hwid_list.length > license.hwid_cap) { %>
+                                Inactive (IP-Cap & HWID-Cap Reached)
+                              <% } else if (license.ip_list && license.ip_list.length > license.ip_cap) { %>
+                                Inactive (IP-Cap Reached)
+                              <% } else if (license.hwid_list && license.hwid_list.length > license.hwid_cap) { %>
+                                Inactive (HWID-Cap Reached)
+                              <% } else { %>
+                                Active
+                              <% } %>
+                            </span>
+                          <% } else if (license.expires_date && currentDate > expiresDate) { %>
+                            <span class="badge bg-<%- license.expires_date && currentDate > expiresDate ? "red" : "green" %>">
+                              <% if (license.expires_date && currentDate > expiresDate) { %>
+                                Inactive (Expired)
+                              <% } else { %>
+                                Active
+                              <% } %>
+                            </span>
+                          <% } else { %>
+                            <span class="badge bg-green">
+                                Active
+                            </span>
+                          <% } %>
+                        </td>
+                        <% if (user.role !== "support") { %>
+                          <td class="d-flex gap-2">
+                            <button onclick="refreshLicense('<%= license.license %>')" class="badge badge-outline text-orange" title="Refresh License">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-refresh" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"></path>
+                                <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
+                              </svg>
+                            </button>
+                            <button onclick="resetData('<%= license.license %>')" class="badge badge-outline text-purple" title="Reset IP's & HWID's">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-zoom-reset" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M21 21l-6 -6"></path>
+                                <path d="M3.268 12.043a7.017 7.017 0 0 0 6.634 4.957a7.012 7.012 0 0 0 7.043 -6.131a7 7 0 0 0 -5.314 -7.672a7.021 7.021 0 0 0 -8.241 4.403"></path>
+                                <path d="M3 4v4h4"></path>
+                              </svg>
+                            </button>
+                            <a href="/licenses/<%= license.license %>" class="badge badge-outline text-green">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-pencil" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4"></path>
+                                <path d="M13.5 6.5l4 4"></path>
+                              </svg>
+                            </a>
+                            <button onclick="deleteLicense('<%= license.license %>')" class="badge badge-outline text-red">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-x" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M18 6l-12 12"></path>
+                                <path d="M6 6l12 12"></path>
+                              </svg>
+                            </button>
+                          </td>
+                        <% } %>
+                      </tr>
+                    <% }) %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <%- include ("../partials/footer") %> 
+      </div>
+    </div>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/jq-3.6.0/dt-1.13.2/af-2.5.2/datatables.min.js"></script>
+    <script>
+      let table = null;
+      $(document).ready(() => {
+        table = $("#table").DataTable();
+      });
+
+      async function deleteLicense(license) {
+        iziToast.show({
+          theme: 'dark',
+          icon: 'iziToast-icon ico-error revealIn',
+          title: 'Are you sure?',
+          message: "You won't be able to revert this!",
+          layout: 2,
+          position: 'center',
+          overlay: true,
+          progressBarColor: 'rgb(0, 255, 184)',
+          buttons: [
+            [
+              '<button class="btn btn-danger">Delete</button>',
+              async function(instance, toast) {
+                await instance.hide({ transitionOut: 'fadeOutUp', }, toast);
+                const res = await fetch(`/api/web/licenses/${license}`, {
+                  method: "DELETE"
+                });
+
+                const data = await res.json();
+              
+                if (res.status !== 200) {
+                  return iziToast.show({
+                    title: data?.message || "Something went wrong!",
+                    color: "red",
+                    position: "topRight",
+                    layout: 1,
+                    icon: "iziToast-icon ico-error revealIn"
+                  });
+                }
+
+                table.column(2).data().filter(lic => lic === license).row().remove().draw()
+                return iziToast.show({
+                  title: data?.message || "License deleted correctly!",
+                  color: "green",
+                  position: "topRight",
+                  layout: 1,
+                  icon: "iziToast-icon ico-success revealIn"
+                });
+              },
+              true
+            ],
+            [
+              '<button>Close</button>',
+              function (instance, toast) {
+                instance.hide({
+                  transitionOut: 'fadeOutUp',
+                }, toast, 'buttonName');
+              }
+            ]
+          ]
+        });
+      }
+      async function resetData(license) {
+        iziToast.show({
+          theme: 'dark',
+          icon: 'iziToast-icon ico-error revealIn',
+          title: 'Are you sure you want to reset your IPs & HWIDs?',
+          message: "You won't be able to revert this!",
+          layout: 2,
+          position: 'center',
+          overlay: true,
+          progressBarColor: 'rgb(0, 255, 184)',
+          buttons: [
+            [
+              '<button class="btn btn-danger">Reset IPS & HWIDS</button>',
+              async function(instance, toast) {
+                await instance.hide({ transitionOut: 'fadeOutUp', }, toast);
+                const res = await fetch(`/api/web/reset-license/${license}`, {
+                  method: "PATCH"
+                });
+
+                const data = await res.json();
+
+                if (res.status !== 210) {
+                  return iziToast.show({
+                    title: data?.message || "Something went wrong!",
+                    color: "red",
+                    position: "topRight",
+                    layout: 1,
+                    icon: "iziToast-icon ico-error revealIn"
+                  });
+                }
+
+                return iziToast.show({
+                  title: data?.message || "IP's & HWID's reset correctly!",
+                  color: "green",
+                  position: "topRight",
+                  layout: 1,
+                  icon: "iziToast-icon ico-success revealIn",
+                  onClosing: () => {
+                    location.reload()
+                  }
+                });
+              },
+              true
+            ],
+            [
+              '<button>Close</button>',
+              function (instance, toast) {
+                instance.hide({
+                  transitionOut: 'fadeOutUp',
+                }, toast, 'buttonName');
+              }
+            ]
+          ]
+        });
+      }
+
+      async function refreshLicense(license) {
+        iziToast.show({
+          theme: 'dark',
+          icon: 'iziToast-icon ico-error revealIn',
+          title: 'Are you sure you want to refresh your license?',
+          message: "You won't be able to revert this!",
+          layout: 2,
+          position: 'center',
+          overlay: true,
+          progressBarColor: 'rgb(0, 255, 184)',
+          buttons: [
+            [
+              '<button class="btn btn-danger">Refresh License</button>',
+              async function(instance, toast) {
+                await instance.hide({ transitionOut: 'fadeOutUp', }, toast);
+                const res = await fetch(`/api/web/refresh-license/${license}`, {
+                  method: "PATCH"
+                });
+
+                const data = await res.json();
+
+                if (res.status !== 210) {
+                  return iziToast.show({
+                    title: data?.message || "Something went wrong!",
+                    color: "red",
+                    position: "topRight",
+                    layout: 1,
+                    icon: "iziToast-icon ico-error revealIn"
+                  });
+                }
+
+                return iziToast.show({
+                  title: data?.message || "License refreshed correctly!",
+                  color: "green",
+                  position: "topRight",
+                  layout: 1,
+                  icon: "iziToast-icon ico-success revealIn",
+                  onClosing: () => {
+                    location.reload()
+                  }
+                });
+              },
+              true
+            ],
+            [
+              '<button>Close</button>',
+              function (instance, toast) {
+                instance.hide({
+                  transitionOut: 'fadeOutUp',
+                }, toast, 'buttonName');
+              }
+            ]
+          ]
+        });
+      }
+    </script>
+    <style>
+      .col-sm-12.col-md-6 {
+        padding-right: 1.3rem!important;
+        padding-left: 1.3rem!important;
+        margin-bottom: 0.5rem!important;
+        margin-top: 1rem!important;
+      }
+
+      .col-sm-12.col-md-5 {
+        padding-right: 1rem!important;
+        padding-left: 1rem!important;
+        margin-bottom: 1rem!important;
+      }
+
+      div.dataTables_wrapper div.dataTables_paginate {
+        margin: .5rem!important;
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js" integrity="sha512-Zq9o+E00xhhR/7vJ49mxFNJ0KQw1E1TMWkPTxrWcnpfEFDEXgUiwJHIKit93EW/XxE31HSI5GEOW06G6BF1AtA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/dist/js/tabler.min.js?1668287865" defer></script>
+    <script src="/dist/js/demo.min.js?1668287865" defer></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5PE1JS9ZWW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-5PE1JS9ZWW');
+</script>
+  </body>
+</html>

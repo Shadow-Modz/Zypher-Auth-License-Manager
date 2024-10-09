@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <%- include ("../partials/head") %>
+  <title>Zypher - Downloads</title>
+</head>
+
+<body>
+  <script src="/dist/js/demo-theme.min.js?1668287865"></script>
+  <div class="page">
+    <%- include ("../partials/navbar", { slt: "d"}) %>
+    <div class="page-wrapper">
+      <div class="page-body">
+        <div class="container-xl">
+          <% if (authError) { %>
+          <div class="alert alert-danger alert-dismissible" role="alert">
+            <div class="d-flex">
+              <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+                  <path d="M12 8l0 4" />
+                  <path d="M12 16l.01 0" />
+                </svg>
+              </div>
+              <div>
+                <h4 class="alert-title"><%= authError %>&hellip;</h4>
+              </div>
+            </div>
+            <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+          </div>
+          <% } %>
+          <div class="row row-deck row-cards">
+            <!-- Header -->
+            <div class="col-12">
+              <div class="card card-md">
+                <div class="card-stamp card-stamp-lg">
+                  <div class="card-stamp-icon bg-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-download" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                      <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"></path>
+                      <path d="M7 11l5 5l5 -5"></path>
+                      <path d="M12 4l0 12"></path>
+                    </svg>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div class="row align-items-center">
+                    <div class="col-10">
+                      <h3 class="h1">Download - System</h3>
+                      <div class="markdown text-muted">
+                        Welcome to the Zypher download system, here you can download the products you have purchased
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <% products.forEach(product => { %>
+            <div class="col-md-6 col-lg-3">
+              <div class="card">
+                <div class="ribbon ribbon-top bg-<%= files[product.name].length ? "success": "danger" %>">
+                  <% if (files[product.name].length) { %>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M5 12l5 5l10 -10"></path>
+                  </svg>
+                  <% } else { %>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-x" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M18 6l-12 12"></path>
+                    <path d="M6 6l12 12"></path>
+                  </svg>
+                  <% } %>
+                </div>
+                <div class="img-responsive img-responsive-21x9 card-img-top" style='background-image: url("<%= product.image || `https://cdn.shadowalpha.net/VRC/Worlds/Shop/cart.png` %> %>")'></div>
+                <div class="card-body">
+                  <h3 class="text-center"><%= product.name %></h3>
+                  <p class="text-muted text-center"><%= product.description %></p>
+                  <div class="dropdown <%= files[product.name].length ? "" : "cursor-not-allowed" %>">
+                    <button class="btn btn-pill btn-<%= files[product.name].length ? "success": "danger disabled" %> w-100 dropdown-toggle" data-bs-toggle="dropdown" aria-label="Open user menu">
+                      Download
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-start dropdown-menu-arrow">
+                      <span class="dropdown-header">Versions Avaliable</span>
+                      <% files[product.name].forEach(element => { %>
+                      <a class="dropdown-item" href="/download/<%= product.name %>/<%= element %>">
+                        <%= element %>
+                      </a>
+                      <% }) %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <% }) %>
+          </div>
+        </div>
+        <%- include ("../partials/footer") %>
+      </div>
+    </div>
+    <script src="/dist/libs/apexcharts/dist/apexcharts.min.js?1668287865" defer></script>
+    <script src="/dist/js/tabler.min.js?1668287865" defer></script>
+    <script src="/dist/js/demo.min.js?1668287865" defer></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5PE1JS9ZWW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-5PE1JS9ZWW');
+</script>
+    <!--Start of Tawk.to Script-->
+<script type="text/javascript">
+  var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+  (function(){
+  var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+  s1.async=true;
+  s1.src='https://embed.tawk.to/65464e25f2439e1631ebbecc/1heda2h12';
+  s1.charset='UTF-8';
+  s1.setAttribute('crossorigin','*');
+  s0.parentNode.insertBefore(s1,s0);
+  })();
+  </script>
+  <!--End of Tawk.to Script-->
+</body>
+
+</html>

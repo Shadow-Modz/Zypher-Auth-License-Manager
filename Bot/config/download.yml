@@ -1,0 +1,26 @@
+MainEmbed:
+  Title: Download Panel
+  Description: Click the button below to download.
+Buttons:
+  - Name: Download
+    Emoji: 📥
+    CustomId: download_file
+    URL: test
+  - Name: Download2
+    Emoji: 📥
+    CustomId: download_file2
+    URL: https://example.com/download2
+  - Name: Download3
+    Emoji: 📥
+    CustomId: download_file3
+    URL: https://www.google.com
+    Style: Link
+  - Name: Download4
+    Emoji: 📥
+    CustomId: download_file4
+    URL: https://example.com/download4
+  - Name: External Link
+    Emoji: 🔗
+    CustomId: external_link
+    URL: https://example.com
+    Style: Link

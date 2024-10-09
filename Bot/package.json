@@ -1,0 +1,41 @@
+{
+  "name": "skyguard",
+  "version": "1.4.0",
+  "description": "A discord bot for manage licenses",
+  "scripts": {
+    "start": "NODE_NO_WARNINGS=1 ts-node src/index.ts",
+    "start:dev": "ts-node-dev src/index.ts",
+    "start:prod": "NODE_ENV=production NODE_NO_WARNINGS=1 node dist/index.js",
+    "build": "tsc",
+    "obf": "tsc && npm run obfuscate",
+    "obfuscate": "node obfuscate.js",
+    "watch": "tsc -w"
+  },
+  "author": "Shadow_Alpha_",
+  "private": true,
+  "dependencies": {
+    "axios": "^1.7.4",
+    "chartjs-node-canvas": "^4.1.6",
+    "crypto": "^1.0.1",
+    "discord.js": "^14.13.0",
+    "express": "^4.19.2",
+    "express-rate-limit": "^6.7.0",
+    "glob": "8.1.0",
+    "js-yaml": "4.1.0",
+    "mongoose": "^6.11.3",
+    "ts-lib": "^0.0.5"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.15",
+    "@types/express-serve-static-core": "^4.17.33",
+    "@types/glob": "^8.0.0",
+    "@types/js-yaml": "^4.0.5",
+    "@types/node": "18.11.7",
+    "@typescript-eslint/eslint-plugin": "^5.46.1",
+    "@typescript-eslint/parser": "^5.46.1",
+    "eslint": "^8.26.0",
+    "ts-node": "10.9.1",
+    "ts-node-dev": "2.0.0",
+    "typescript": "^5.3.2"
+  }
+}

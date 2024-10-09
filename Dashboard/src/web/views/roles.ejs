@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <%- include ("../partials/head") %>
+    <title>Zypher - Roles</title>
+</head>
+<body >
+<script src="/dist/js/demo-theme.min.js?1668287865"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css" integrity="sha512-O03ntXoVqaGUTAeAmvQ2YSzkCvclZEcPQu1eqloPaHfJ5RuNGiS4l+3duaidD801P50J28EHyonCV06CUlTSag==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.13.2/af-2.5.2/datatables.min.css"/>
+<div class="page">
+    <%- include ("../partials/navbar", { slt: "r"}) %>
+    <div class="page-wrapper">
+        <!-- Page header -->
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <h2 class="page-title">
+                            Roles (<%= roles.length %>)
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Page body -->
+        <div class="page-body">
+            <div class="container-xl">
+                <div class="card">
+                    <div class="table-responsive">
+                        <table id="table" class="table text-nowrap table-vcenter card-table table-striped">
+                            <thead>
+                            <tr>
+                                <th>Role ID</th>
+                                <th>Badge</th>
+                                <th>Permissions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <% roles.reverse().forEach((role) => { %>
+                                <% const rolesColor = { user: "bg-azure-lt", support: "bg-green-lt", developer: "bg-white-lt", admin: "bg-red-lt", owner: "bg-yellow-lt" } %>
+                                <tr>
+                                    <td>
+                                        <%= role.roleId %>
+                                    </td>
+                                    <td>
+                                      <span class="badge <%= rolesColor[role.name.toLowerCase()] %>">
+                                        <%= role.name %>
+                                      </span>
+                                    </td>
+                                    <td>
+                                        <% const permissions = [] %>
+                                        <% for (const permission of role.permissions) { %>
+                                            <% permissions.push(permission.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')) %>
+                                        <% } %>
+                                        <%= permissions.join(", ") %>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <%- include ("../partials/footer") %>
+    </div>
+</div>
+<style>
+    .col-sm-12.col-md-6 {
+        padding-right: 1.3rem!important;
+        padding-left: 1.3rem!important;
+        margin-bottom: 0.5rem!important;
+        margin-top: 1rem!important;
+    }
+
+    .col-sm-12.col-md-5 {
+        padding-right: 1rem!important;
+        padding-left: 1rem!important;
+        margin-bottom: 1rem!important;
+    }
+
+    div.dataTables_wrapper div.dataTables_paginate {
+        margin: .5rem!important;
+    }
+</style>
+<script type="text/javascript" src="https://cdn.datatables.net/v/bs5/jq-3.6.0/dt-1.13.2/af-2.5.2/datatables.min.js"></script>
+<script>
+    $(document).ready(() => {
+        $("#table").DataTable();
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js" integrity="sha512-Zq9o+E00xhhR/7vJ49mxFNJ0KQw1E1TMWkPTxrWcnpfEFDEXgUiwJHIKit93EW/XxE31HSI5GEOW06G6BF1AtA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="/dist/js/tabler.min.js?1668287865" defer></script>
+<script src="/dist/js/demo.min.js?1668287865" defer></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5PE1JS9ZWW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-5PE1JS9ZWW');
+</script>
+</body>
+</html>
